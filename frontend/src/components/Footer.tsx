@@ -5,7 +5,7 @@ export default function Footer() {
   const navigate = useNavigate();
 
   return (
-    <footer className="border-t border-border/40 bg-background/95 backdrop-blur">
+    <footer className="bg-white/30">
       <div className="container mx-auto px-4 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           <div className="space-y-4">
