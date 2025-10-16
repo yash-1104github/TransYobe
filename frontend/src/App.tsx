@@ -8,6 +8,8 @@ import VideoPlayer from "./page/GeneratePage";
 import LoginPage from "./page/LoginPage";
 import ProtectedRoute from "@/utils/ProtectedRoute";
 import SignupPage from "./page/SignUpPage";
+import { ChatProvider } from "@/context/ChatContext";
+import { VideoProvider } from "@/context/VideoContext";
 
 const queryClient = new QueryClient();
 
@@ -16,21 +18,25 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route
-            path="/player"
-            element={
-              <ProtectedRoute>
-                <VideoPlayer />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
+      <VideoProvider>
+        <ChatProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route
+                path="/player"
+                element={
+                  <ProtectedRoute>
+                    <VideoPlayer />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </BrowserRouter>
+        </ChatProvider>
+      </VideoProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

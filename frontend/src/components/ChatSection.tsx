@@ -6,10 +6,14 @@ import { Play, Send, Download } from "lucide-react";
 import GeneratingMessage from "@/components/GeneratingMessage";
 import { useState } from "react";
 import AskQuestions from "@/api/AskQuestions";
+import { useVideo } from "@/context/VideoContext";
 
-export function ChatSection({ videoId, loading }) {
+export function ChatSection({ loading }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+ 
+  //@ts-ignore
+  const { videoId } = useVideo();
 
   const handleDownloadChat = () => {
     if (messages.length === 0) return;
@@ -99,13 +103,13 @@ export function ChatSection({ videoId, loading }) {
 
       <ScrollArea className="flex-col lg:flex-1 p-4 relative">
         {!videoId ? (
-          <div className="absolute inset-0 flex flex-col  items-center justify-center text-muted-foreground">
+          <div className="flex flex-col  items-center justify-center py-12 lg:py-60 text-muted-foreground">
             <div className="text-base px-2 font-medium ">
               Please Load a Video to get ready to chat with me{" "}
             </div>
           </div>
         ) : loading ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 backdrop-blur-sm z-10">
+          <div className="flex flex-col items-center justify-center bg-background/70 backdrop-blur-sm   py-12 lg:py-60  z-10">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
             <p className="text-sm font-medium text-muted-foreground text-center">
               Processing video... This might take a few minutes.
@@ -114,7 +118,7 @@ export function ChatSection({ videoId, loading }) {
             </p>
           </div>
         ) : messages.length === 0 ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
+          <div className="flex flex-col items-center justify-center  py-12 lg:py-60  text-muted-foreground">
             <p className="text-xl font-medium">Ready to chat!</p>
             <p className="text-base">
               Ask questions about the video content below.

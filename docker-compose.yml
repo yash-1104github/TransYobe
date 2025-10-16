@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-transyobe
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    networks:
+      - app-network
+    env_file:
+      - ./frontend/.env  
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-transyobe
+    restart: unless-stopped
+    ports:
+      - "8000:8000"     
+    env_file:
+       - ./backend/.env 
+    networks:
+      - app-network
+    depends_on:
+      - mongo
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  mongo:
+    image: mongo:7.0
+    container_name: transyobe-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+volumes:
+  mongo-data:
+
+networks:
+  app-network:
+    driver: bridge
