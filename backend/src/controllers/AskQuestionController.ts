@@ -20,6 +20,18 @@ export default async function handleAskQuestion(req: Request, res: Response) {
 
     const answer = await loadanswer(question);
 
+    if (!answer || !answer.content) {
+      // Agent returned nothing or failed
+      return res.status(503).json({
+        success: false,
+        error: "Agent failed to respond",
+        details: "The AI model may be overloaded. Please try again later.",
+      });
+    }
+       
+
+    console.log(answer);
+
     let formattedAnswer = answer.content
       .replace(/\[\d+\]/g, " ")
       .replace(/\*/g, "")

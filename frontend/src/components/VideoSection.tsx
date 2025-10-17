@@ -30,8 +30,9 @@ export default function VideoPlayer({ loading, setLoading }) {
 
     try {
       loadVideo(youtubeUrl);
-      // Optionally trigger backend transcript:
+
       // const res = await Transcript({ youtubeUrl });
+      
     } catch (err) {
       console.error("Something went wrong:", err);
       toast("Failed to load video");

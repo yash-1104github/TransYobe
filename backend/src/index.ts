@@ -3,13 +3,17 @@ import "dotenv/config";
 import cors from "cors";
 import router from "./routes/routes";
 import connectDB from "./databse/mongo_db";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";                        
 
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+}));
 
 if (connectDB()) {
   console.log("connected to mongoDB");
