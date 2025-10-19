@@ -29,9 +29,11 @@ export default function VideoPlayer({ loading, setLoading }) {
     }
 
     try {
-      loadVideo(youtubeUrl);
+      await loadVideo(youtubeUrl);
 
-      // const res = await Transcript({ youtubeUrl });
+      const res = await Transcript({ youtubeUrl });
+      console.log("transcript called");
+      console.log(res);
       
     } catch (err) {
       console.error("Something went wrong:", err);

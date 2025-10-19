@@ -19,14 +19,14 @@ export const VideoProvider = ({ children }) => {
     localStorage.setItem("video_id", videoId || "");
   }, [youtubeUrl, videoId]);
 
-  const extractVideoId = (url) => {
+  const extractVideoId = (url : any) => {
     const regExp =
       /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
     const match = url.match(regExp);
     return match && match[1] ? match[1] : null;
   };
 
-  const loadVideo = (url) => {
+  const loadVideo = (url : any) => {
     setYoutubeUrl(url);
     const id = extractVideoId(url);
     if (id) setVideoId(id);
