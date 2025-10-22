@@ -33,8 +33,7 @@ export default function VideoPlayer({ loading, setLoading }) {
 
       const res = await Transcript({ youtubeUrl });
       console.log("transcript called");
-      console.log(res);
-      
+      console.log(res); 
     } catch (err) {
       console.error("Something went wrong:", err);
       toast("Failed to load video");
@@ -45,7 +44,6 @@ export default function VideoPlayer({ loading, setLoading }) {
 
   return (
     <div>
-      {/* Input + Load Button */}
       <div className="relative flex flex-col md:flex-row gap-4 md:gap-20 w-full md:px-4 md:py-4 justify-center items-start">
         <div className="relative w-full flex md:flex-1">
           <Input
@@ -68,7 +66,6 @@ export default function VideoPlayer({ loading, setLoading }) {
         </Button>
       </div>
 
-      {/* Video Display */}
       <div className="mt-24">
         {videoId ? (
           <div className="w-full aspect-video rounded-lg overflow-hidden -mt-16 shadow-2xl border border-border">

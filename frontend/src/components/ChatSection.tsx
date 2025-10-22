@@ -2,16 +2,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Play, Send, Download } from "lucide-react";
+import { Play, Send, Download, Mic } from "lucide-react";
 import GeneratingMessage from "@/components/GeneratingMessage";
 import { useState } from "react";
 import AskQuestions from "@/api/AskQuestions";
 import { useVideo } from "@/context/VideoContext";
 
+declare global {
+  interface Window {
+    webkitSpeechRecognition: any;
+  }
+}
+
+
 export function ChatSection({ loading }) {
+
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
- 
+
   //@ts-ignore
   const { videoId } = useVideo();
 
@@ -30,7 +38,7 @@ export function ChatSection({ loading }) {
     a.download = "chat.txt";
     a.click();
 
-    URL.revokeObjectURL(url); 
+    URL.revokeObjectURL(url);
   };
 
   const handleSendMessage = async () => {
@@ -75,6 +83,26 @@ export function ChatSection({ loading }) {
       });
     }
   };
+
+  const handleRecordQuery = async () => {
+  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = true;
+  recognition.continuous = true;
+
+  recognition.onstart = () => console.log("Speech recognition started");
+  recognition.onend = () => console.log("Speech recognition ended");
+  recognition.onerror = (e: any) => console.error("Speech error:", e.error);
+  recognition.onresult = (event: any) => {
+    const transcript = event.results[event.results.length - 1][0].transcript;
+    console.log("🗣️ Transcript:", transcript);
+  };
+
+  recognition.start();
+};
+
 
   return (
     <>
@@ -149,7 +177,7 @@ export function ChatSection({ loading }) {
       </ScrollArea>
 
       <div className="p-8 border-t border-border">
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           <Input
             placeholder="Ask a question..."
             className="p-5"
@@ -158,9 +186,15 @@ export function ChatSection({ loading }) {
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
             disabled={!videoId || loading}
           />
+          {/* <Button
+            onClick={handleRecordQuery}
+            disabled={!videoId  || loading}
+            variant="hero"
+          >
+            <Mic className="w-4 h-4" />
+          </Button> */}
           <Button
             onClick={handleSendMessage}
-            size="icon"
             disabled={!videoId || !message.trim() || loading}
             variant="hero"
           >

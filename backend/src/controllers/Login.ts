@@ -19,7 +19,7 @@ export default async function Login(req: Request, res: Response) {
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "15d" }
     );
 
     res.json({ message: "Login successful", token, user });
