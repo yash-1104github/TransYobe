@@ -1,7 +1,9 @@
 import { extractVideoId } from "../utils/extractVideoId.js";
 import { Request, Response, NextFunction } from "express";
-import { fetchTranscript, YoutubeTranscript } from "youtube-transcript-plus";
-import { createCollection, loadSampleData } from "../RAG_piplines/dataIngesion.js";
+import {
+  createCollection,
+  loadSampleData,
+} from "../RAG_piplines/dataIngesion.js";
 
 interface types {
   item: any;
@@ -10,7 +12,7 @@ interface types {
 }
 
 export default async function handleTranscript(req: Request, res: Response) {
-   const { youtubeUrl }: any = req.body;
+  const { youtubeUrl }: any = req.body;
 
   if (!youtubeUrl) {
     return res.status(400).json({ error: "Missing Youtube url." });
@@ -25,7 +27,18 @@ export default async function handleTranscript(req: Request, res: Response) {
   try {
     console.log(`Fetching transcript for video: ${videoId}`);
 
-     const transcript = await YoutubeTranscript.fetchTranscript(videoId, { lang: "en" });
+    const response = await fetch(
+      `https://trans-yobe.vercel.app/api/getTranscript?videoId=${videoId}`
+    );
+
+    if (!response.ok) {
+      return res
+        .status(response.status)
+        .json({ error: "Failed to fetch transcript" });
+    }
+
+    const data = await response.json();
+    const transcript = data.transcript;
 
     if (transcript.length > 0) {
       const propertranscript = transcript
@@ -34,14 +47,14 @@ export default async function handleTranscript(req: Request, res: Response) {
 
       const finaltranscript = propertranscript
         .replace(/&amp;/g, "&")
-        .replace(/&#39;/g, "'") 
-        .replace(/\\n/g, " ") 
-        .replace(/\n/g, " ") 
-        .replace(/\s+/g, " ") 
-        .trim(); 
+        .replace(/&#39;/g, "'")
+        .replace(/\\n/g, " ")
+        .replace(/\n/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
 
       console.log("Fetched Transcipt from api");
-   
+
       // await createCollection();
       console.log("Collection created");
 
