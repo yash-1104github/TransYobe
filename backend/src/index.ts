@@ -25,6 +25,17 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
+app.get("/test-youtube", async (req, res) => {
+  try {
+    const response = await fetch("https://www.youtube.com/watch?v=s2EYIDY8wSM");
+    res.status(200).send({ status: response.status });
+  } catch (err) {
+    //@ts-ignore
+    res.status(500).send({ error: err.message });
+  }
+});
+
+
 app.use("/api/v1", router);
 
 app.listen(8000, () => {
