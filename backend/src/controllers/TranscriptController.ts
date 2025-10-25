@@ -1,6 +1,6 @@
 import { extractVideoId } from "../utils/extractVideoId.js";
 import { Request, Response, NextFunction } from "express";
-import { fetchTranscript } from "youtube-transcript-plus";
+import { fetchTranscript, YoutubeTranscript } from "youtube-transcript-plus";
 import { createCollection, loadSampleData } from "../RAG_piplines/dataIngesion.js";
 
 interface types {
@@ -25,7 +25,7 @@ export default async function handleTranscript(req: Request, res: Response) {
   try {
     console.log(`Fetching transcript for video: ${videoId}`);
 
-    const transcript = await fetchTranscript(videoId, { lang: "en" });
+     const transcript = await YoutubeTranscript.fetchTranscript(videoId, { lang: "en" });
 
     if (transcript.length > 0) {
       const propertranscript = transcript
