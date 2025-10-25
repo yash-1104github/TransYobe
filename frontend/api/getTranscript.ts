@@ -1,4 +1,4 @@
-import { YoutubeTranscript } from "youtube-transcript-plus";
+import { fetchTranscript } from "youtube-transcript-plus";
 
 export default async function handler(req: any, res: any) {
   const { videoId } = req.query;
@@ -6,7 +6,8 @@ export default async function handler(req: any, res: any) {
   if (!videoId) return res.status(400).json({ error: "Missing videoId" });
 
   try {
-    const transcript = await YoutubeTranscript.fetchTranscript(videoId);
+    const transcript = await fetchTranscript(videoId);
+    console.log("Transcript fetched successfully", transcript);
     res.status(200).json({ transcript });
   } catch (err) {
     console.error("Transcript error:", err.message);

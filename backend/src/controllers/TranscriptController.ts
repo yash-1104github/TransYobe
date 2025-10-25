@@ -32,18 +32,14 @@ export default async function handleTranscript(req: Request, res: Response) {
     );
 
     if (!response.ok) {
-      return res
-        .status(response.status)
-        .json({ error: "Failed to fetch transcript" });
+      return res.status(response.status).json({ error: "Failed to fetch transcript" });
     }
 
     const data = await response.json();
     const transcript = data.transcript;
 
     if (transcript.length > 0) {
-      const propertranscript = transcript
-        .map((item: types) => item.text)
-        .join(" ");
+      const propertranscript = transcript.map((item: types) => item.text).join(" ");
 
       const finaltranscript = propertranscript
         .replace(/&amp;/g, "&")
