@@ -5,6 +5,7 @@ export default async function Transcript({ youtubeUrl }) {
   try {
 
     const token = localStorage.getItem("token");
+    console.log("req sent to backend api transcript");
     const res = await axios.post(`${API_URL}/transcript`,
       {
         youtubeUrl,

@@ -6,6 +6,7 @@ export default async function handler(req: any, res: any) {
   if (!videoId) return res.status(400).json({ error: "Missing videoId" });
 
   try {
+    console.log("Fetching transcript for videoId:", videoId);
     const transcript = await fetchTranscript(videoId, { lang: "en" });
     console.log("Transcript fetched successfully", transcript);
     res.status(200).json({ transcript });
