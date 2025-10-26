@@ -27,9 +27,9 @@ export default async function handleTranscript(req: Request, res: Response) {
   try {
     console.log('inside try block of controller transcript');
     console.log(`Fetching transcript for video: ${videoId}`);
-    console.log("req to frontend api to get transcripting");
     const response = await fetch(`https://trans-yobe.vercel.app/api/getTranscript?videoId=${videoId}`);
-
+    console.log("response", response);
+    
     if (!response.ok) {
       return res.status(response.status).json({ error: "Failed to fetch transcript" });
     }
