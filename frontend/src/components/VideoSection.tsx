@@ -20,8 +20,7 @@ export default function VideoPlayer({ loading, setLoading }) {
       return;
     }
 
-    const youtubeRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|shorts\/)?([A-Za-z0-9_-]{11})([&?].*)?$/;
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|shorts\/)?([A-Za-z0-9_-]{11})([&?].*)?$/;
     if (!youtubeRegex.test(youtubeUrl)) {
       toast("Invalid YouTube URL");
       setLoading(false);
