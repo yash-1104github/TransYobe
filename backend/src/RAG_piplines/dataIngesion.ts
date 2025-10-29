@@ -38,7 +38,7 @@ export const loadSampleData = async (content: any) => {
   console.log("chunks created");
 
   const ai = new GoogleGenAI({
-    apiKey: "AIzaSyBCvDW-ZhsjmFaoeI1rWN7muVKJLE5pBXA",
+    apiKey: process.env.GOOGLE_API_KEY,
   });
 
   //data embedding gemini model convert text to vector and storing
