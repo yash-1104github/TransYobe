@@ -1,72 +1,112 @@
 import "dotenv/config";
 import { GoogleGenAI } from "@google/genai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import db from "../databse/vector_db";
-
-
-type SimilarityMetrix = "dot_product" | "cosine" | "euclidean";
-
+import { Index } from "@pinecone-database/pinecone";
+import pc from "../databse/vector_db";
+import { sendProgress, sendDone } from "../utils/sse";
 
 const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 510,
-  chunkOverlap: 100,
+  chunkSize: Number(process.env.CHUNK_SIZE),
+  chunkOverlap: Number(process.env.CHUNK_OVERLAP),
 });
 
-export const createCollection = async (
-  similarityMetrix: SimilarityMetrix = "dot_product"
-) => {
-  const res = await db.createCollection(process.env.ASTRA_DB_COLLECTION, {
-    vector: {
+const indexName = process.env.PINECONE_INDEX_NAME;
+
+//Ensures the Pinecone index exists and is ready before using it.
+export async function ensureIndex(): Promise<void> {
+  const { indexes } = await pc.listIndexes();
+  const exists = indexes.some((idx) => idx.name === indexName);
+
+  if (!exists) {
+    console.log(`Creating Pinecone index: ${indexName}`);
+    await pc.createIndex({
+      name: indexName,
       dimension: 768,
-      metric: similarityMetrix,
-    },
-  });
+      metric: "cosine",
+      spec: { serverless: { cloud: "aws", region: "us-east-1" } },
+    });
+  }
 
-  console.log(res);
-};
+  // Wait until ready
+  let ready = false;
+  while (!ready) {
+    const { status } = await pc.describeIndex(indexName);
+    if (status?.ready) {
+      ready = true;
+      console.log("Index is ready!");
+    } else {
+      console.log("Waiting for index to be ready...");
+      await new Promise((res) => setTimeout(res, 5000));
+    }
+  }
+}
 
-//Data Ingesion Pipeline includes below 3 steps
-export const loadSampleData = async (content: any) => {
-  const collection = db.collection(process.env.ASTRA_DB_COLLECTION);
+// Initializes the Pinecone index (creates if needed and returns it)
+export async function initPinecone(): Promise<Index> {
+  await ensureIndex();
+  return pc.Index(indexName);
+}
 
-  //implement functionality to remove older data
-  const deleteOld = await collection.deleteMany({});
-  console.log(`Deleted ${deleteOld.deletedCount} old records`);
+// Lazily initialized promise for the Pinecone index
+export const indexPromise: Promise<Index> = initPinecone();
 
-  //convert data into chunks
+
+// Ingests and stores text embeddings in Pinecone
+
+export const loadSampleData = async (content: string): Promise<void> => {
+
+  const index = await indexPromise; // ✅ ensure 'index' is available here
+  console.log("🚀 Starting Pinecone data ingestion...");
+
+  // Split content into chunks
   const chunks = await splitter.splitText(content);
-  console.log("chunks created");
+  console.log(`✅ Split text into ${chunks.length} chunks`);
 
+  //Initialize embedding model
   const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY
+    apiKey: process.env.GOOGLE_API_KEY!,
   });
 
-  //data embedding gemini model convert text to vector and storing
-  for await (const chunk of chunks) {
+  // Clear existing data
+  try {
+    await index.deleteAll();
+    console.log("Cleared old vectors from Pinecone index");
+  } catch (err: any) {
+    console.warn("Could not clear previous data:", err.message);
+  }
+
+  //store embeddings
+  let count = 0;
+
+  for (const chunk of chunks) {
+
     const response = await ai.models.embedContent({
-      model: "gemini-embedding-001",
+      model: process.env.GEMINI_EMBEDDING_MODEL,
       contents: chunk,
     });
 
-    console.log("converted text into vector");
     const embeddings = response.embeddings;
-
     if (embeddings && embeddings.length > 0) {
-      const fullVector = embeddings[0].values;
+      const vector = embeddings[0].values.slice(0, 768);
 
-      if (fullVector && Array.isArray(fullVector)) {
-        //store only vector of 768 dimensions
-        const vector = fullVector.slice(0, 768);
+      await index.upsert([
+        {
+          id: `chunk-${count}`,
+          values: vector,
+          metadata: { text: chunk },
+        },
+      ]);
 
-        //storing the vector into vector database
-        const res = await collection.insertOne({
-          $vector: vector,
-          text: chunk,
-        });
+      
+      const percentage = Math.round(((count + 1) / chunks.length) * 100);
+      console.log(`📦 Stored chunk ${count + 1}/${chunks.length}`);
 
-        console.log("Saved data to the collection , database Astra DB");
-        console.log(res);
-      }
+      sendProgress(percentage);
+      count++;
     }
   }
+
+  console.log("Data ingestion complete....");
 };
+
+sendDone();

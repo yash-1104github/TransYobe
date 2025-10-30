@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Transcript from "@/api/Transcript";
 import { useVideo } from "@/context/VideoContext";
+import { useState } from "react";
+import { set } from "react-hook-form";
 
-export default function VideoPlayer({ loading, setLoading }) {
+export default function VideoPlayer({ loading, setLoading, setProgress }) {
   //@ts-ignore
-  const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } =
-    useVideo();
+  const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } = useVideo();
 
   const handleLoadVideo = async () => {
     setLoading(true);
+    setProgress(0);
 
     if (!youtubeUrl || youtubeUrl.trim() === "") {
       toast("YouTube URL is missing");
@@ -22,6 +24,7 @@ export default function VideoPlayer({ loading, setLoading }) {
 
     const youtubeRegex =
       /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|shorts\/)?([A-Za-z0-9_-]{11})([&?].*)?$/;
+
     if (!youtubeRegex.test(youtubeUrl)) {
       toast("Invalid YouTube URL");
       setLoading(false);
@@ -29,14 +32,40 @@ export default function VideoPlayer({ loading, setLoading }) {
     }
 
     try {
-      await loadVideo(youtubeUrl);
+      await loadVideo(youtubeUrl); //set youtube url and set its video id only
 
-      const res = await Transcript({ youtubeUrl });
-      console.log("transcript called");
-      console.log(res); 
+      const transcriptPromise = Transcript({ youtubeUrl });
+
+      const eventSource = new EventSource("http://localhost:8000/api/v1/progress");
+
+      eventSource.onmessage = (event) => {
+
+        if (event.data === "done") {
+          setProgress(100);
+          setTimeout(() => {
+            eventSource.close();
+            setLoading(false);
+          }, 500);
+          return;
+        }
+
+        const data = JSON.parse(event.data);
+        setProgress(data.progress);
+      };
+
+      eventSource.onerror = () => {
+        console.error("SSE connection error");
+        eventSource.close();
+        setLoading(false);
+      };
+
+      const res = await transcriptPromise;
+
+      console.log("transcript called & response", res);
+
     } catch (err) {
       console.error("Something went wrong:", err);
-      toast("Failed to load video");
+      toast("Failed to load video, Please try again.");
     } finally {
       setLoading(false);
     }
@@ -50,7 +79,7 @@ export default function VideoPlayer({ loading, setLoading }) {
             placeholder="Paste YouTube URL here..."
             value={youtubeUrl}
             onChange={(e) => setYoutubeUrl(e.target.value)}
-            className="w-full px-4 py-4"
+            className="w-full font-medium px-4 py-5"
           />
           {youtubeUrl && (
             <SlClose
@@ -60,9 +89,15 @@ export default function VideoPlayer({ loading, setLoading }) {
           )}
         </div>
 
-        <Button onClick={handleLoadVideo} disabled={loading} variant="hero">
-          <Play className="w-4 h-4 mr-4" />
-          {loading ? "Loading..." : "Load Video"}
+        <Button
+          onClick={handleLoadVideo}
+          disabled={loading || Boolean(localStorage.getItem("video_id"))}
+          variant="hero"
+        >
+          <Play className="w-4 h-4 mr-2" />
+          <span className="text-base">
+            {loading ? "Loading..." : "Load Video"}
+          </span>
         </Button>
       </div>
 

@@ -1,7 +1,7 @@
 import { extractVideoId } from "../utils/extractVideoId.js";
 import { Request, Response, NextFunction } from "express";
 import { fetchTranscript } from "youtube-transcript-plus";
-import { createCollection, loadSampleData } from "../RAG_piplines/dataIngesion.js";
+import { ensureIndex, loadSampleData } from "../RAG_piplines/dataIngesion.js";
 
 interface types {
   item: any;
@@ -42,8 +42,8 @@ export default async function handleTranscript(req: Request, res: Response) {
 
       console.log("Fetched Transcipt from api");
    
-      // await createCollection();
-      console.log("Collection created");
+      // await ensureIndex();
+      console.log("Index created");
 
       await loadSampleData(finaltranscript);
 

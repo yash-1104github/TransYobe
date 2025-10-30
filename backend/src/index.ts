@@ -5,7 +5,6 @@ import router from "./routes/routes";
 import connectDB from "./databse/mongo_db";
 import { Request, Response, NextFunction } from "express";                        
 
-
 const app = express();
 
 app.use(express.json());
