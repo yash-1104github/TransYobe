@@ -9,6 +9,7 @@ import { useState } from "react";
 import { set } from "react-hook-form";
 
 export default function VideoPlayer({ loading, setLoading, setProgress }) {
+  const API_URL = import.meta.env.VITE_API_URL;
   //@ts-ignore
   const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } =
     useVideo();
@@ -36,9 +37,7 @@ export default function VideoPlayer({ loading, setLoading, setProgress }) {
 
       const transcriptPromise = Transcript({ youtubeUrl });
 
-      const eventSource = new EventSource(
-        "http://localhost:8000/api/v1/progress"
-      );
+      const eventSource = new EventSource(`${API_URL}/progress`);
 
       eventSource.onmessage = (event) => {
         if (event.data === "done") {
