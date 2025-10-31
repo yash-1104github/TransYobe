@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { fetchTranscript } from "youtube-transcript-plus";
 import { ensureIndex, loadSampleData } from "../RAG_piplines/dataIngesion.js";
 import { YoutubeTranscript } from "youtube-transcript-plus";
+import { fetch } from "undici";
 
 interface types {
   item: any;
@@ -29,16 +30,22 @@ export default async function handleTranscript(req: Request, res: Response) {
      const transcript = await YoutubeTranscript.fetchTranscript(videoId, {
       lang: "en",
       fetchOptions: {
-        fetch: (url: string) =>
+        // override the internal fetch used by youtube-transcript-plus
+        fetch: (url:any) =>
           fetch(url, {
             headers: {
               "User-Agent":
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-              "Accept-Language": "en-US,en;q=0.9",
-              "Referer": "https://www.youtube.com/",
               "Accept":
                 "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+              "Accept-Language": "en-US,en;q=0.9",
+              "Referer": "https://www.youtube.com/",
               "Connection": "keep-alive",
+              "Upgrade-Insecure-Requests": "1",
+              "Sec-Fetch-Dest": "document",
+              "Sec-Fetch-Mode": "navigate",
+              "Sec-Fetch-Site": "none",
+              "Sec-Fetch-User": "?1",
             },
           }),
       },
