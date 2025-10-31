@@ -14,7 +14,7 @@ interface types {
 }
 
 export default async function handleTranscript(req: Request, res: Response) {
-  const { youtubeUrl }: any = req.body;
+   const { youtubeUrl }: any = req.body;
 
   if (!youtubeUrl) {
     return res.status(400).json({ error: "Missing Youtube url." });
@@ -44,16 +44,16 @@ export default async function handleTranscript(req: Request, res: Response) {
 
       const finaltranscript = propertranscript
         .replace(/&amp;/g, "&")
-        .replace(/&#39;/g, "'")
-        .replace(/\\n/g, " ")
-        .replace(/\n/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+        .replace(/&#39;/g, "'") 
+        .replace(/\\n/g, " ") 
+        .replace(/\n/g, " ") 
+        .replace(/\s+/g, " ") 
+        .trim(); 
 
       console.log("Fetched Transcipt from api");
-
-      // await createCollection();
-      console.log("Collection created");
+   
+      // await ensureIndex();
+      console.log("Index created");
 
       await loadSampleData(finaltranscript);
 
