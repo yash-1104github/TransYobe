@@ -1,4 +1,4 @@
-# TransYobe — AI-Powered YouTube Q&A Assistant
+# TransYobe — AI Powered YouTube Assistant
 </hr>
 
 **Application Overview:**
