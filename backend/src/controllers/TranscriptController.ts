@@ -23,20 +23,14 @@ export default async function handleTranscript(req: Request, res: Response) {
   }
 
   try {
-    console.log('inside try block of controller transcript');
     console.log(`Fetching transcript for video: ${videoId}`);
-    const response = await fetch(`https://trans-yobe.vercel.app/api/getTranscript?videoId=${videoId}`);
-    console.log("response", response);
-    
-    if (!response.ok) {
-      return res.status(response.status).json({ error: "Failed to fetch transcript" });
-    }
 
-    const data = await response.json();
-    const transcript = data.transcript;
+    const transcript = await fetchTranscript(videoId, { lang: "en" });
 
     if (transcript.length > 0) {
-      const propertranscript = transcript.map((item: types) => item.text).join(" ");
+      const propertranscript = transcript
+        .map((item: types) => item.text)
+        .join(" ");
 
       const finaltranscript = propertranscript
         .replace(/&amp;/g, "&")
@@ -46,7 +40,7 @@ export default async function handleTranscript(req: Request, res: Response) {
         .replace(/\s+/g, " ")
         .trim();
 
-      console.log("Fetched Transcipt from api");
+      console.log("Fetched Transcipt from api", finaltranscript);
 
       // await createCollection();
       console.log("Collection created");
