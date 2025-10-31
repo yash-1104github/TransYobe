@@ -14,7 +14,7 @@ AI assistant that comprehends the video’s content — all within an elegant da
 - Database / Vector Store: Pinecone , MongoDB
 - AI Model: Gemini (Google Generative AI)
 - Architecture: Retrieval-Augmented Generation (RAG), Server Sent Events (SSE) 
-- Hosting: Vercel / Render
+- Hosting: Docker , Vercel , Render
 
 **🚀 Key Features**
 
