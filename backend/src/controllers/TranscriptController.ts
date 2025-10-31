@@ -2,6 +2,7 @@ import { extractVideoId } from "../utils/extractVideoId.js";
 import { Request, Response, NextFunction } from "express";
 import { fetchTranscript } from "youtube-transcript-plus";
 import { ensureIndex, loadSampleData } from "../RAG_piplines/dataIngesion.js";
+import { YoutubeTranscript } from "youtube-transcript-plus";
 
 interface types {
   item: any;
@@ -25,7 +26,23 @@ export default async function handleTranscript(req: Request, res: Response) {
   try {
     console.log(`Fetching transcript for video: ${videoId}`);
 
-    const transcript = await fetchTranscript(videoId, { lang: "en" });
+     const transcript = await YoutubeTranscript.fetchTranscript(videoId, {
+      lang: "en",
+      fetchOptions: {
+        fetch: (url: string) =>
+          fetch(url, {
+            headers: {
+              "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+              "Accept-Language": "en-US,en;q=0.9",
+              "Referer": "https://www.youtube.com/",
+              "Accept":
+                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+              "Connection": "keep-alive",
+            },
+          }),
+      },
+    });
 
     if (transcript.length > 0) {
       const propertranscript = transcript
@@ -71,4 +88,4 @@ export default async function handleTranscript(req: Request, res: Response) {
         .json({ success: false, error: "An unexpected error occurred." });
     }
   }
-}
+};
