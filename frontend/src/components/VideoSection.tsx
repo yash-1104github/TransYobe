@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Transcript from "@/api/Transcript";
 import { useVideo } from "@/context/VideoContext";
+import { useState } from "react";
+import { set } from "react-hook-form";
 
-export default function VideoPlayer({ loading, setLoading }) {
+export default function VideoPlayer({ loading, setLoading, setProgress }) {
   //@ts-ignore
-  const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } =
-    useVideo();
+  const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } = useVideo();
 
   const handleLoadVideo = async () => {
     setLoading(true);
+    setProgress(0);
 
     if (!youtubeUrl || youtubeUrl.trim() === "") {
       toast("YouTube URL is missing");
@@ -34,7 +36,7 @@ export default function VideoPlayer({ loading, setLoading }) {
       console.log("Transcript response:", res); 
     } catch (err) {
       console.error("Something went wrong:", err);
-      toast("Failed to load video");
+      toast("Failed to load video, Please try again.");
     } finally {
       setLoading(false);
     }
@@ -48,7 +50,7 @@ export default function VideoPlayer({ loading, setLoading }) {
             placeholder="Paste YouTube URL here..."
             value={youtubeUrl}
             onChange={(e) => setYoutubeUrl(e.target.value)}
-            className="w-full px-4 py-4"
+            className="w-full font-medium px-4 py-5"
           />
           {youtubeUrl && (
             <SlClose
@@ -58,9 +60,15 @@ export default function VideoPlayer({ loading, setLoading }) {
           )}
         </div>
 
-        <Button onClick={handleLoadVideo} disabled={loading} variant="hero">
-          <Play className="w-4 h-4 mr-4" />
-          {loading ? "Loading..." : "Load Video"}
+        <Button
+          onClick={handleLoadVideo}
+          disabled={loading || Boolean(localStorage.getItem("video_id"))}
+          variant="hero"
+        >
+          <Play className="w-4 h-4 mr-2" />
+          <span className="text-base">
+            {loading ? "Loading..." : "Load Video"}
+          </span>
         </Button>
       </div>
 

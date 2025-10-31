@@ -7,6 +7,8 @@ import GeneratingMessage from "@/components/GeneratingMessage";
 import { useState } from "react";
 import AskQuestions from "@/api/AskQuestions";
 import { useVideo } from "@/context/VideoContext";
+import { Progress } from "@/components/ui/progress";
+
 
 declare global {
   interface Window {
@@ -14,9 +16,7 @@ declare global {
   }
 }
 
-
-export function ChatSection({ loading }) {
-
+export function ChatSection({ loading, progress }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
 
@@ -84,31 +84,32 @@ export function ChatSection({ loading }) {
     }
   };
 
-  const handleRecordQuery = async () => {
-  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  // const handleRecordQuery = async () => {
+  //   const SpeechRecognition =
+  //     (window as any).SpeechRecognition ||
+  //     (window as any).webkitSpeechRecognition;
 
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.interimResults = true;
-  recognition.continuous = true;
+  //   const recognition = new SpeechRecognition();
+  //   recognition.lang = "en-US";
+  //   recognition.interimResults = true;
+  //   recognition.continuous = true;
 
-  recognition.onstart = () => console.log("Speech recognition started");
-  recognition.onend = () => console.log("Speech recognition ended");
-  recognition.onerror = (e: any) => console.error("Speech error:", e.error);
-  recognition.onresult = (event: any) => {
-    const transcript = event.results[event.results.length - 1][0].transcript;
-    console.log("🗣️ Transcript:", transcript);
-  };
+  //   recognition.onstart = () => console.log("Speech recognition started");
+  //   recognition.onend = () => console.log("Speech recognition ended");
+  //   recognition.onerror = (e: any) => console.error("Speech error:", e.error);
+  //   recognition.onresult = (event: any) => {
+  //     const transcript = event.results[event.results.length - 1][0].transcript;
+  //     console.log("🗣️ Transcript:", transcript);
+  //   };
 
-  recognition.start();
-};
-
+  //   recognition.start();
+  // };
 
   return (
     <>
       <div className="flex px-4 md:px-8 justify-between items-center p-4 border-b border-border">
         <div className="flex flex-col">
-          <h3 className="font-semibold text-2xl text-gray-800">
+          <h3 className="font-semibold text-2xl text-blue-600">
             Ask Me Anything
           </h3>
           <p className="text-sm text-muted-foreground">
@@ -137,8 +138,16 @@ export function ChatSection({ loading }) {
             </div>
           </div>
         ) : loading ? (
+
           <div className="flex flex-col items-center justify-center bg-background/70 backdrop-blur-sm   py-12 lg:py-60  z-10">
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+
+            {/* <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div> */}
+
+            <div className="w-full px-5">
+              <Progress value={progress} className="h-3" />
+              <div className="text-center text-base mt-2">{progress}%</div>
+            </div>
+
             <p className="text-sm font-medium text-muted-foreground text-center">
               Processing video... This might take a few minutes.
               <br />
@@ -180,7 +189,7 @@ export function ChatSection({ loading }) {
         <div className="flex gap-4">
           <Input
             placeholder="Ask a question..."
-            className="p-5"
+            className="px-3 py-5 front-medium w-full"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}

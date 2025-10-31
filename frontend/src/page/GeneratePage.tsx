@@ -6,6 +6,7 @@ import { useState } from "react";
 export default function GeneratePage() {
 
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   return (
     <div className="min-h-screen bg-background/30 lg:bg-background">
@@ -17,11 +18,12 @@ export default function GeneratePage() {
           <VideoPlayer
             loading={loading}
             setLoading={setLoading}
+            setProgress={setProgress}
           />
         </div>
 
         <div className="w-full lg:w-[35%] border-t lg:border-t-0 lg:border-l border-borde bg-card/30 backdrop-blur-sm flex flex-col">
-          <ChatSection loading={loading} />
+          <ChatSection loading={loading} progress={progress} />
         </div>
 
       </div>

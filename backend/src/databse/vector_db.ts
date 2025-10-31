@@ -1,8 +1,8 @@
-import { DataAPIClient } from "@datastax/astra-db-ts";
+// config/pinecone.ts
+import { Pinecone } from "@pinecone-database/pinecone";
 
-const client = new DataAPIClient(process.env.ASTRA_DB_APPLICATION_TOKEN);
-const db = client.db(process.env.ASTRA_DB_API_ENDPOINT, {
-  keyspace: process.env.ASTRA_DB_NAMESPACE,
+const pc = new Pinecone({
+  apiKey: process.env.PINECONE_API_KEY,
 });
 
-export default db;
+export default pc;

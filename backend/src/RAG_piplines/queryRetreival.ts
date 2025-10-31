@@ -1,18 +1,14 @@
 import "dotenv/config";
 import { GoogleGenAI } from "@google/genai";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import OpenAI from "openai";
-import db from "../databse/vector_db";
+import pc from "../databse/vector_db";
 
 const openai = new OpenAI({
   apiKey: process.env.GOOGLE_API_KEY,
   baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
 });
 
-const splitter = new RecursiveCharacterTextSplitter({
-  chunkSize: 510,
-  chunkOverlap: 100,
-});
+const indexName = process.env.PINECONE_INDEX_NAME;
 
 //Query Retreival Pipeline inclues below 3 steps
 export const loadanswer = async (question: any) => {
@@ -23,9 +19,10 @@ export const loadanswer = async (question: any) => {
 
     //data embedding gemini model convert from text to vector
     const response = await ai.models.embedContent({
-      model: "gemini-embedding-001",
+      model: process.env.GEMINI_EMBEDDING_MODEL,
       contents: question,
     });
+
     console.log("embedding the question");
 
     const embeddings = response.embeddings;
@@ -33,22 +30,27 @@ export const loadanswer = async (question: any) => {
     const vector = fullVector.slice(0, 768);
     console.log("convert the question to vector", vector);
 
-    let docContext;
+    
+    let docContext = "";
     //Retrieval from the database that match the given query
     try {
-      const collection = db.collection("youtube");
-      const cursor = collection.find(null, {
-        sort: {
-          $vector: vector,
-        },
-        limit: 10,
+      const index = pc.Index(indexName);
+      console.log("Querying Pinecone for similar context...");
+
+      const queryResponse = await index.query({
+        vector,
+        topK: 10,
+        includeMetadata: true, 
       });
 
       //Augmented means giving matched info as context and actual question
-      const documents = await cursor.toArray();
-      const docsMap = documents?.map((doc) => doc.text);
+      const matches = queryResponse.matches || [];
+      const docsMap = matches.map((m) => m.metadata?.text).filter(Boolean);
+      docContext = docsMap.join("\n\n");
+      console.log("Retrieved context from Pinecone.");
 
-      docContext = JSON.stringify(docsMap);
+      console.log(`Retrieved ${matches.length} relevant chunks from Pinecone.`);
+
     } catch (err) {
       console.log(err);
     }

@@ -20,8 +20,7 @@ export const VideoProvider = ({ children }) => {
   }, [youtubeUrl, videoId]);
 
   const extractVideoId = (url : any) => {
-    const regExp =
-      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+    const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
     const match = url.match(regExp);
     return match && match[1] ? match[1] : null;
   };
