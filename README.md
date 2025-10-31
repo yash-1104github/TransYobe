@@ -9,11 +9,11 @@ AI assistant that comprehends the video’s content — all within an elegant da
 **🛠 Tech Stack Used**
 
 - Frontend: React, TypeScript, TailwindCSS
-- Backend: Express.js (REST API Architecture)
+- Backend: Express.js , Node.js
 - Authentication: JWT Authentication
-- Database / Vector Store: Pinecone
+- Database / Vector Store: Pinecone , MongoDB
 - AI Model: Gemini (Google Generative AI)
-- Architecture: Retrieval-Augmented Generation (RAG)
+- Architecture: Retrieval-Augmented Generation (RAG), Server Sent Events (SSE) 
 - Hosting: Vercel / Render
 
 **🚀 Key Features**
