@@ -9,7 +9,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: ["https://trans-yobe.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 }));
@@ -23,6 +23,17 @@ app.get("/", (req: Request, res: Response) => {
     message: "Hi from server",
   });
 });
+
+app.get("/test-youtube", async (req, res) => {
+  try {
+    const response = await fetch("https://www.youtube.com/watch?v=s2EYIDY8wSM");
+    res.status(200).send({ status: response.status });
+  } catch (err) {
+    //@ts-ignore
+    res.status(500).send({ error: err.message });
+  }
+});
+
 
 app.use("/api/v1", router);
 

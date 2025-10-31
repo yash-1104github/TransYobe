@@ -64,7 +64,7 @@ export const loadSampleData = async (content: string): Promise<void> => {
 
   //Initialize embedding model
   const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY!,
+    apiKey: process.env.GOOGLE_API_KEY,
   });
 
   // Clear existing data
