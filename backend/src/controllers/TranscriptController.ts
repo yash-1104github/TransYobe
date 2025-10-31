@@ -2,10 +2,6 @@ import { extractVideoId } from "../utils/extractVideoId.js";
 import { Request, Response, NextFunction } from "express";
 import { fetchTranscript } from "youtube-transcript-plus";
 import { ensureIndex, loadSampleData } from "../RAG_piplines/dataIngesion.js";
-import {
-  createCollection,
-  loadSampleData,
-} from "../RAG_piplines/dataIngesion.js";
 
 interface types {
   item: any;
