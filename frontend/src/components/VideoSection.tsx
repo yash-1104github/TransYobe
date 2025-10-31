@@ -10,7 +10,8 @@ import { set } from "react-hook-form";
 
 export default function VideoPlayer({ loading, setLoading, setProgress }) {
   //@ts-ignore
-  const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } = useVideo();
+  const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } =
+    useVideo();
 
   const handleLoadVideo = async () => {
     setLoading(true);
@@ -22,7 +23,8 @@ export default function VideoPlayer({ loading, setLoading, setProgress }) {
       return;
     }
 
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|shorts\/)?([A-Za-z0-9_-]{11})([&?].*)?$/;
+    const youtubeRegex =
+      /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|shorts\/)?([A-Za-z0-9_-]{11})([&?].*)?$/;
     if (!youtubeRegex.test(youtubeUrl)) {
       toast("Invalid YouTube URL");
       setLoading(false);
@@ -30,10 +32,37 @@ export default function VideoPlayer({ loading, setLoading, setProgress }) {
     }
 
     try {
-      await loadVideo(youtubeUrl);
-      console.log("transcript api call");
-      const res = await Transcript({ youtubeUrl });
-      console.log("Transcript response:", res); 
+      await loadVideo(youtubeUrl); //set youtube url and set its video id only
+
+      const transcriptPromise = Transcript({ youtubeUrl });
+
+      const eventSource = new EventSource(
+        "http://localhost:8000/api/v1/progress"
+      );
+
+      eventSource.onmessage = (event) => {
+        if (event.data === "done") {
+          setProgress(100);
+          setTimeout(() => {
+            eventSource.close();
+            setLoading(false);
+          }, 500);
+          return;
+        }
+
+        const data = JSON.parse(event.data);
+        setProgress(data.progress);
+      };
+
+      eventSource.onerror = () => {
+        console.error("SSE connection error");
+        eventSource.close();
+        setLoading(false);
+      };
+
+      const res = await transcriptPromise;
+
+      console.log("transcript called & response", res);
     } catch (err) {
       console.error("Something went wrong:", err);
       toast("Failed to load video, Please try again.");
