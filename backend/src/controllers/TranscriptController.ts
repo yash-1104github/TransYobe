@@ -27,29 +27,23 @@ export default async function handleTranscript(req: Request, res: Response) {
   try {
     console.log(`Fetching transcript for video: ${videoId}`);
 
-     const transcript = await YoutubeTranscript.fetchTranscript(videoId, {
-      lang: "en",
-      fetchOptions: {
-        // override the internal fetch used by youtube-transcript-plus
-        fetch: (url:any) =>
-          fetch(url, {
-            headers: {
-              "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
-              "Accept":
-                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-              "Accept-Language": "en-US,en;q=0.9",
-              "Referer": "https://www.youtube.com/",
-              "Connection": "keep-alive",
-              "Upgrade-Insecure-Requests": "1",
-              "Sec-Fetch-Dest": "document",
-              "Sec-Fetch-Mode": "navigate",
-              "Sec-Fetch-Site": "none",
-              "Sec-Fetch-User": "?1",
-            },
-          }),
-      },
-    });
+    const WORKER_URL = "https://aged-wind-2f7b.gyash1104.workers.dev";
+
+    async function getTranscript(videoId: any) {
+      console.log(`Fetching transcript for video: ${videoId}`);
+
+      const transcript = await YoutubeTranscript.fetchTranscript(videoId, {
+        lang: "en",
+        fetchOptions: {
+          fetch: (url: any) =>
+            fetch(`${WORKER_URL}?v=${videoId}`),
+        },
+      });
+
+      return transcript;
+    };
+
+    const transcript = await getTranscript(videoId);
 
     if (transcript.length > 0) {
       const propertranscript = transcript
@@ -95,4 +89,4 @@ export default async function handleTranscript(req: Request, res: Response) {
         .json({ success: false, error: "An unexpected error occurred." });
     }
   }
-};
+}
