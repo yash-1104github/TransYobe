@@ -2,8 +2,7 @@ import { extractVideoId } from "../utils/extractVideoId.js";
 import { Request, Response, NextFunction } from "express";
 import { fetchTranscript } from "youtube-transcript-plus";
 import { ensureIndex, loadSampleData } from "../RAG_piplines/dataIngesion.js";
-import { YoutubeTranscript } from "youtube-transcript-plus";
-import { fetch } from "undici";
+import findTranscript from "../utils/api.js";
 
 interface types {
   item: any;
@@ -27,56 +26,46 @@ export default async function handleTranscript(req: Request, res: Response) {
   try {
     console.log(`Fetching transcript for video: ${videoId}`);
 
-    const WORKER_URL = "https://aged-wind-2f7b.gyash1104.workers.dev";
+    const response = await findTranscript(videoId);
 
-    async function getTranscript(videoId: any) {
-      console.log(`Fetching transcript for video: ${videoId}`);
+    //@ts-ignore
+    const combinedTranscript = response.transcript
+      .map((item: any) => item.text)
+      .join(" ");
+    console.log("Combined Transcript:", combinedTranscript);
 
-      const transcript = await YoutubeTranscript.fetchTranscript(videoId, {
-        lang: "en",
-        fetchOptions: {
-          fetch: (url: any) =>
-            fetch(`${WORKER_URL}?v=${videoId}`),
-        },
-      });
-
-      return transcript;
-    };
-
-    const transcript = await getTranscript(videoId);
-
-    if (transcript.length > 0) {
-      const propertranscript = transcript
-        .map((item: types) => item.text)
-        .join(" ");
-
-      const finaltranscript = propertranscript
-        .replace(/&amp;/g, "&")
-        .replace(/&#39;/g, "'")
-        .replace(/\\n/g, " ")
-        .replace(/\n/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-
-      console.log("Fetched Transcipt from api", finaltranscript);
-
-      // await createCollection();
-      console.log("Collection created");
-
-      await loadSampleData(finaltranscript);
-
-      console.log("Transcript saved in memory vector DB.");
-
-      res.json({
-        success: true,
-        result: finaltranscript,
-        message: "Transcript processed and stored in memory.",
-      });
-    } else {
-      res
+    if (combinedTranscript.trim().length === 0) {
+      return res
         .status(404)
         .json({ success: false, error: "No transcript found for this video." });
     }
+
+    const finaltranscript = combinedTranscript
+      .replace(/&gt;&gt;/g, ">>")
+      .replace(/&gt;/g, ">")
+      .replace(/&lt;/g, "<")
+      .replace(/&amp;/g, "&")
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/\\n/g, " ")
+      .replace(/\n/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    console.log("Fetched Transcipt from api", finaltranscript);
+
+    // await createCollection();
+    console.log("Collection created");
+
+    await loadSampleData(finaltranscript);
+
+    console.log("Transcript saved in memory vector DB.");
+
+    res.json({
+      success: true,
+      result: finaltranscript,
+      message: "Transcript processed and stored in memory.",
+    });
   } catch (error: any) {
     console.error(`Error fetching transcript`, error);
     if (error.message.includes("No captions found")) {
