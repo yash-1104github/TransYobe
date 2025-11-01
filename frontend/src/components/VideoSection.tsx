@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Transcript from "@/api/Transcript";
 import { useVideo } from "@/context/VideoContext";
-import { useState } from "react";
-import { set } from "react-hook-form";
 
 export default function VideoPlayer({ loading, setLoading, setProgress }) {
   const API_URL = import.meta.env.VITE_API_URL;
