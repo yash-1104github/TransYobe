@@ -7,12 +7,15 @@ import { Request, Response, NextFunction } from "express";
 
 const app = express();
 
-app.use(express.json());
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: ["https://trans-yobe.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
 }));
+
+app.options('/', cors());
+app.use(express.json());
+
 
 if (connectDB()) {
   console.log("connected to mongoDB");
