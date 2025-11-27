@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-white/30">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="hidden md:grid  md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
@@ -21,7 +21,7 @@ export default function Footer() {
               Transform passive viewing into active learning with AI-powered video assistance.
             </p>
           </div>
-
+           
           <div>
             <h3 className="font-semibold mb-4">Product</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -84,9 +84,10 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+       
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="md:mt-12 pt-8 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} AI Video Learn. All rights reserved.
           </p>

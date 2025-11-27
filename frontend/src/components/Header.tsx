@@ -8,18 +8,24 @@ export default function Header() {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const [user, setUser] = useState<{ name: string } | null>(null);
+  const [name, setName] = useState("");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    const client = JSON.parse(storedUser);
+    console.log("storeUser", client);
+    console.log(typeof client);
+    const detail = client.name.split(" ")[0];
+    setName(detail);
+    console.log("name", detail);
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
   }, []);
 
-
   const handleLogout = () => {
-    localStorage.removeItem("token"); 
-    localStorage.removeItem("user"); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
     navigate("/");
   };
@@ -40,21 +46,30 @@ export default function Header() {
         </div>
 
         <nav className="flex items-center gap-4">
+          {user ? (
+            <div className="text-lg font-medium text-green-500">
+              👋 Welcome {name}
+            </div>
+          ) : null}
           {!isHome && (
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
               <Home className="w-4 h-4 mr-2" />
               Home
             </Button>
           )}
-           
+
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-8">
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 Logout
               </Button>
             </div>
           ) : (
-            <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/login")}
+            >
               Login
             </Button>
           )}
