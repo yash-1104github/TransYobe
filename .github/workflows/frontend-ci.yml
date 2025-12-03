@@ -1,0 +1,78 @@
+name: Frontend CI/CD
+
+on: 
+    push: 
+        branches: 
+            - main
+        paths:
+            - "frontend/**"
+    pull_request:
+        branches:
+            - main
+        paths:
+            - "frontend/**"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+    
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Set Up Node.js
+              uses: actions/stepup-node@v4
+              with: 
+                node-version: '20'
+
+            - name: Install dependencies
+              working-directory: ./frontend
+              run: npm install
+
+            - name: Code linting
+              working-directory: ./frontend
+              run: npm run lint
+
+            - name: Build Code
+              env: 
+                VITE_API_URL: ${{secrets.VITE_API_URL}}
+              working-directory: ./frontend
+              run: npm run build
+            
+            - name: Upload built frontend (artifact)
+              uses: actions/upload-artifact@v4
+              with:
+                 name: frontend-dist        
+                 path: frontend/dist 
+              
+    deploy:
+         runs-on: ubuntu-latest
+         needs: build
+
+         steps:
+             - name: Checkout Code
+               uses: actions/checkout@v4
+
+             - name:  Set up Docker Buildx
+               uses: docker/setup-buildx-action@v3
+
+             - name: Login to Docker Hub
+               uses: docker/login-action@v3
+               with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+             - name: Build and Push Docker Image 
+               run: |
+                docker buildx build \
+                --platform linux/amd64,linux/arm64 \
+                --file frontend/Dockerfile \
+                -t ${{ secrets.DOCKERHUB_USERNAME }}/transyobe_frontend:latest \
+                --push \
+                --build-arg VITE_API_URL="${{ secrets.VITE_API_URL }}" \
+                frontend
+
+             - name: Successfully Deployed
+               run: echo "Frontend image pushed to Docker Hub successfully."
+
+

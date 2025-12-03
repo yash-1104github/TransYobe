@@ -61,10 +61,13 @@ AI assistant that comprehends the video’s content — all within an elegant da
 - RAPIDAPI_KEY="your_rapidapi_key"
 ```
 
-- Run the application:
+**Run the application:**
+
 ```bash
-- npm run dev
-- Access the app at http://localhost:3000
+- docker compose pull
+- docker compose up -d
+- http://localhost:5173
+- http://localhost:8000
 ```
 
 ⭐ Star this repository if TransYobe helped you explore YouTube videos smarter with AI!
