@@ -36,22 +36,35 @@ AI assistant that comprehends the video’s content — all within an elegant da
 
 **⚙️ Installation**
 - Clone the repository:
-- git clone https://github.com/yourusername/transYobe.git
-- cd transYobe
-- npm install
+```bash
+ git clone https://github.com/yourusername/transYobe.git
+ cd transYobe/frontend
+ npm install
+ npm run dev
+ cd backend
+ npm install 
+ npm run dev
+```
 
 - Set up environment variables — Create a .env file in the root directory and add the following keys:
 
+```bash
 - JWT_SECRET=your_jwt_secret
 - PINECONE_API_KEY=your_pinecone_key
 - PINECONE_ENVIRONMENT=your_pinecone_environment
 - GEMINI_API_KEY=your_gemini_key
+- MONGO_URI="you_db_url"
+- PINECONE_ENVIRONMENT="us-east1-gcp"
+- GEMINI_EMBEDDING_MODEL="gemini-embedding-001"
+- CHUNK_SIZE=1020
+- CHUNK_OVERLAP=100
+- RAPIDAPI_KEY="your_rapidapi_key"
+```
 
 - Run the application:
+```bash
 - npm run dev
 - Access the app at http://localhost:3000
-
-**🤝 Contributing**
-- Contributions are welcome!
+```
 
 ⭐ Star this repository if TransYobe helped you explore YouTube videos smarter with AI!
