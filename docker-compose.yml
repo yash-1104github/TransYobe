@@ -2,25 +2,20 @@ version: "3.9"
 
 services:
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        VITE_API_URL: "http://localhost:8000/api/v1"
+    image: yash4256/transyobe_frontend:latest
     container_name: frontend-transyobe
     restart: unless-stopped
     ports:
       - "5173:80"
     networks:
       - app-network
-    
+    environment:
+      - VITE_API_URL=http://backend:8000/api/v1
     depends_on:
       - backend
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: yash4256/transyobe-backend:latest  
     container_name: backend-transyobe
     restart: unless-stopped
     ports:
@@ -31,9 +26,6 @@ services:
       - app-network
     depends_on:
       - mongo
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
 
   mongo:
     image: mongo:7.0

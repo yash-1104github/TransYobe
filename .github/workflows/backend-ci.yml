@@ -1,0 +1,87 @@
+name: Backend CI/CD Pipeline
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "backend/**"
+
+    pull_request:
+        branches:
+            - main
+        paths:
+            - "backend/**"
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+            
+            - name: Set up node.js
+              uses: actions/setup-node@v4
+
+            - name: Install Dependencies
+              working-directory: ./backend
+              run: npm install
+
+            - name: Code linting
+              working-directory: ./frontend
+              run: npm run lint
+            
+            - name: Build Code
+              working-directory: ./frontend
+              run: npm run build
+
+            - name: Upload built backend (artifact)
+              uses: actions/upload-artifact@v4
+              with:
+                 name: backend-dist        
+                 path: backend/dist 
+
+    deploy:
+        runs-on: ubuntu-latest 
+        needs: build
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Download backend build artifact
+              uses: actions/download-artifact@v4
+              with:
+                 name: backend-dist
+                 path: backend/dist
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name:  Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                 username: ${{ secrets.DOCKERHUB_USERNAME }}
+                 password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Build and Push Docker Image
+              run: |
+                   docker buildx build \
+                    --platform linux/amd64,linux/arm64 \
+                    --file backend/Dockerfile \
+                    -t ${{ secrets.DOCKERHUB_USERNAME }}/transyobe-backend:latest \
+                   --push \
+                   backend
+
+            - name: Deployment confirmation
+              run: echo "Backend image pushed to Docker Hub successfully."
+
+
+
+
+            
+
+
+                 
+
