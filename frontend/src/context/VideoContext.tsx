@@ -1,7 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-//@ts-ignore
-const VideoContext = createContext();
+interface VideoContextType {
+  youtubeUrl: string;
+  setYoutubeUrl: (url: string) => void;
+  videoId: string;
+  loadVideo: () => void;
+  clearVideo: () => void;
+}
+
+const VideoContext = createContext<VideoContextType>({
+  youtubeUrl: "",
+  setYoutubeUrl: () => {},
+  videoId: "",
+  loadVideo: () => {},
+  clearVideo: () => {},
+});
 
 export const VideoProvider = ({ children }) => {
   const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -19,13 +32,13 @@ export const VideoProvider = ({ children }) => {
     localStorage.setItem("video_id", videoId || "");
   }, [youtubeUrl, videoId]);
 
-  const extractVideoId = (url : any) => {
+  const extractVideoId = (url : string) => {
     const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
     const match = url.match(regExp);
     return match && match[1] ? match[1] : null;
   };
 
-  const loadVideo = (url : any) => {
+  const loadVideo = (url : string) => {
     setYoutubeUrl(url);
     const id = extractVideoId(url);
     if (id) setVideoId(id);

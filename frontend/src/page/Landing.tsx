@@ -12,9 +12,6 @@ import {
   Play,
   MessageSquare,
   Sparkles,
-  Zap,
-  Shield,
-  Headphones,
   Star,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";

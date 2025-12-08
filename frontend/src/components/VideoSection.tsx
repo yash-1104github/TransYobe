@@ -8,9 +8,8 @@ import { useVideo } from "@/context/VideoContext";
 
 export default function VideoPlayer({ loading, setLoading, setProgress }) {
   const API_URL = import.meta.env.VITE_API_URL;
-  //@ts-ignore
-  const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } =
-    useVideo();
+
+  const { youtubeUrl, setYoutubeUrl, videoId, loadVideo, clearVideo } = useVideo();
 
   const handleLoadVideo = async () => {
     setLoading(true);

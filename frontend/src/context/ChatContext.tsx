@@ -1,7 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-//@ts-ignore
-const ChatContext = createContext();
+export interface Message {
+  text: string;
+  sender: "user" | "bot"; 
+  timestamp: number;
+}
+
+export interface ChatContextType {
+  messages: Record<string, Message[]>; // videoId -> messages
+  addMessage: (videoId: string, msg: Message) => void;
+  clearMessages: (videoId: string) => void;
+}
+
+const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider = ({ children }) => {
 
@@ -40,5 +51,4 @@ export const ChatProvider = ({ children }) => {
   );
 };
 
-// Custom hook for easy access
 export const useChat = () => useContext(ChatContext);

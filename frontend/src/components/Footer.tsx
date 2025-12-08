@@ -1,8 +1,6 @@
-import { Sparkles, Github, Linkedin } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {  Github, Linkedin } from "lucide-react";
 
 export default function Footer() {
-  const navigate = useNavigate();
 
   return (
       <div className="py-8">

@@ -22,17 +22,4 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
-
-  {
-    files: [
-      'src/components/ui/**/*.{ts,tsx}',
-      'src/context/**/*.{ts,tsx}',     
-      'src/hooks/**/*.{ts,tsx}',       
-      'src/lib/**/*.{ts,tsx}',         
-      'src/utils/**/*.{ts,tsx}',
-    ],
-    rules: {
-      'react-refresh/only-export-components': 'off',
-    },
-  },
 ])

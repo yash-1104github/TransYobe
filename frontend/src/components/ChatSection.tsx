@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Play, Send, Download, Mic } from "lucide-react";
+import { Send, Download } from "lucide-react";
 import GeneratingMessage from "@/components/GeneratingMessage";
 import { useState } from "react";
 import AskQuestions from "@/api/AskQuestions";
@@ -12,7 +12,7 @@ import { Progress } from "@/components/ui/progress";
 
 declare global {
   interface Window {
-    webkitSpeechRecognition: any;
+    webkitSpeechRecognition: typeof SpeechRecognitionEvent;
   }
 }
 
@@ -20,7 +20,6 @@ export function ChatSection({ loading, progress }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
 
-  //@ts-ignore
   const { videoId } = useVideo();
 
   const handleDownloadChat = () => {

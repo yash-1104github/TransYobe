@@ -13,11 +13,11 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
-  const handleChange = (e:any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e:any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await axios.post(

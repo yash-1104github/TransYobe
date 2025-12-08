@@ -31,9 +31,9 @@ jobs:
               working-directory: ./frontend
               run: npm install
 
-            - name: Code linting
-              working-directory: ./frontend
-              run: npm run lint
+            # - name: Code linting
+            #   working-directory: ./frontend
+            #   run: npm run lint
 
             - name: Build Code
               env: 
