@@ -31,11 +31,11 @@ jobs:
               run: npm install
 
             # - name: Code linting
-            #   working-directory: ./frontend
+            #   working-directory: ./backend
             #   run: npm run lint
             
             - name: Build Code
-              working-directory: ./frontend
+              working-directory: ./backend
               run: npm run build
 
             - name: Upload built backend (artifact)
