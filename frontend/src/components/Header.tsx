@@ -12,12 +12,15 @@ export default function Header() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    if (!storedUser) return;
+
     const client = JSON.parse(storedUser);
-    console.log("storeUser", client);
-    console.log(typeof client);
-    const detail = client.name.split(" ")[0];
-    setName(detail);
-    console.log("name", detail);
+
+    if (client) {
+      const detail = client.name.split(" ")[0];
+      setName(detail);
+    }
+
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -48,7 +51,7 @@ export default function Header() {
         <nav className="flex items-center gap-4">
           {user ? (
             <div className="text-lg font-medium text-gray-800 ">
-               Welcome {name}
+              Welcome {name}
             </div>
           ) : null}
           {!isHome && (
