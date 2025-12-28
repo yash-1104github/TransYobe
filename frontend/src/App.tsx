@@ -10,6 +10,7 @@ import ProtectedRoute from "@/utils/ProtectedRoute";
 import SignupPage from "./page/SignUpPage";
 import { ChatProvider } from "@/context/ChatContext";
 import { VideoProvider } from "@/context/VideoContext";
+import { Analytics } from "@vercel/analytics/react"
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
       <VideoProvider>
         <ChatProvider>
           <BrowserRouter>
+           <Analytics />
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<LoginPage />} />
