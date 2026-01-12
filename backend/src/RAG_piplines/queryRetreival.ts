@@ -17,10 +17,6 @@ export const loadanswer = async (question: any) => {
       apiKey: process.env.GOOGLE_API_KEY,
     });
 
-    //@ts-ignore
-    const model = ai.getGenerativeModel({
-      model: "gemini-2.0-flash",
-    });
 
     //data embedding gemini model convert from text to vector
     const response = await ai.models.embedContent({
@@ -78,9 +74,13 @@ USER QUESTION
 ${question}
 `;
     
-    const result = await model.generateContent(prompt);
-    console.log("response from the ai", result.choices[0].message);
-    return result.choices[0].message;
+   const result = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+     contents: prompt,
+    });
+
+    console.log("response from the ai", result);
+    return result;
   } catch (err) {
     console.log(err);
   }
