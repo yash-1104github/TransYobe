@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 
+
 export default function LoginPage() {
 
-  const API_URL = import.meta.env.VITE_API_URL;
-  console.log("API_URL", API_URL);
+  const API_URL = import.meta.env.VITE_API_URL; 
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
@@ -19,7 +21,9 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     try {
+
       const res = await axios.post(
         `${API_URL}/auth/login`,
         formData
@@ -32,6 +36,8 @@ export default function LoginPage() {
       navigate("/player"); 
     } catch (err) {
       toast.error(err.response?.data?.error || "Login failed");
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -69,7 +75,17 @@ export default function LoginPage() {
           </div>
 
           <Button type="submit" className="w-full">
-            Login
+            {
+              loading ? (
+                <>
+                 Loading...
+                </>
+              ): (
+                <>
+                  Login
+                </>
+              )
+            }
           </Button>
 
           <p className="text-sm text-center mt-4">

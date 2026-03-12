@@ -8,6 +8,8 @@ import { toast } from "sonner";
 export default function SignupPage() {
 
   const API_URL = import.meta.env.VITE_API_URL;
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,7 +23,7 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const res = await axios.post(
         `${API_URL}/auth/signup`,
@@ -35,6 +37,8 @@ export default function SignupPage() {
       navigate("/player");
     } catch (err) {
       toast.error(err.response?.data?.error || "Signup failed");
+    } finally {
+       setLoading(false);
     }
   };
 
@@ -84,7 +88,17 @@ export default function SignupPage() {
           </div>
 
           <Button type="submit" className="w-full">
-            Sign Up
+            {
+             loading ? (
+                <>
+                 Loading...
+                </>
+             ): (
+              <>
+                 Register
+              </>
+             )
+             }
           </Button>
 
           <p className="text-sm text-center mt-4">
