@@ -4,7 +4,7 @@ interface VideoContextType {
   youtubeUrl: string;
   setYoutubeUrl: (url: string) => void;
   videoId: string;
-  loadVideo: () => void;
+  loadVideo: (url: string) => void;
   clearVideo: () => void;
 }
 

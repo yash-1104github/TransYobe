@@ -81,10 +81,10 @@ export const Landing = () => {
               <Button
                 size="lg"
                 variant="hero"
-                className="text-lg px-8"
+                className="text-xl px-12 py-6"
                 onClick={() => handleStart()}
               >
-                <Play className="w-8 h-8 mr-2" />
+                <Play className="w-12 h-12 mr-5" />
                 Get Started
               </Button>
             </div>

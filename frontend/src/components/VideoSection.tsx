@@ -1,10 +1,17 @@
-import { Play } from "lucide-react";
+import { Copy, Play } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SlClose } from "react-icons/sl";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import Transcript from "@/api/Transcript";
 import { useVideo } from "@/context/VideoContext";
+
+const DEFAULT_VIDEO_URL = "https://www.youtube.com/watch?v=az8LKObSSxU";
 
 export default function VideoPlayer({ loading, setLoading, setProgress }) {
   const API_URL = import.meta.env.VITE_API_URL;
@@ -15,7 +22,9 @@ export default function VideoPlayer({ loading, setLoading, setProgress }) {
     setLoading(true);
     setProgress(0);
 
-    if (!youtubeUrl || youtubeUrl.trim() === "") {
+    const urlToLoad = youtubeUrl.trim() || DEFAULT_VIDEO_URL;
+
+    if (!urlToLoad) {
       toast("YouTube URL is missing");
       setLoading(false);
       return;
@@ -23,16 +32,16 @@ export default function VideoPlayer({ loading, setLoading, setProgress }) {
 
     const youtubeRegex =
       /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|shorts\/)?([A-Za-z0-9_-]{11})([&?].*)?$/;
-    if (!youtubeRegex.test(youtubeUrl)) {
+    if (!youtubeRegex.test(urlToLoad)) {
       toast("Invalid YouTube URL");
       setLoading(false);
       return;
     }
 
     try {
-      await loadVideo(youtubeUrl); //set youtube url and set its video id only
+      await loadVideo(urlToLoad); //set youtube url and set its video id only
 
-      const transcriptPromise = Transcript({ youtubeUrl });
+      const transcriptPromise = Transcript({ youtubeUrl: urlToLoad });
 
       const eventSource = new EventSource(`${API_URL}/progress`);
 
@@ -67,12 +76,23 @@ export default function VideoPlayer({ loading, setLoading, setProgress }) {
     }
   };
 
+  const handleCopyDummyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(DEFAULT_VIDEO_URL);
+      setYoutubeUrl(DEFAULT_VIDEO_URL);
+      toast("URL copied and added to input");
+    } catch {
+      setYoutubeUrl(DEFAULT_VIDEO_URL);
+      toast("URL added to input");
+    }
+  };
+
   return (
     <div>
       <div className="relative flex flex-col md:flex-row gap-4 md:gap-20 w-full md:px-4 md:py-4 justify-center items-start">
         <div className="relative w-full flex md:flex-1">
           <Input
-            placeholder="Paste YouTube URL here..."
+            placeholder={DEFAULT_VIDEO_URL}
             value={youtubeUrl}
             onChange={(e) => setYoutubeUrl(e.target.value)}
             className="w-full font-medium px-4 py-5"
@@ -85,16 +105,21 @@ export default function VideoPlayer({ loading, setLoading, setProgress }) {
           )}
         </div>
 
-        <Button
-          onClick={handleLoadVideo}
-          disabled={loading || Boolean(localStorage.getItem("video_id"))}
-          variant="hero"
-        >
-          <Play className="w-4 h-4 mr-2" />
-          <span className="text-base">
-            {loading ? "Loading..." : "Load Video"}
-          </span>
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleLoadVideo}
+              disabled={loading || Boolean(localStorage.getItem("video_id"))}
+              variant="hero"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              <span className="text-base">
+                {loading ? "Loading..." : "Load Video"}
+              </span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Click on Load Video</TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="mt-24">
@@ -111,16 +136,35 @@ export default function VideoPlayer({ loading, setLoading, setProgress }) {
             />
           </div>
         ) : (
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-5 px-6 py-8">
             <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
               <Play className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-2xl font-semibold text-foreground">
               No Video Loaded
             </h2>
-            <p className="text-muted-foreground">
-              Paste a YouTube URL above to get started
-            </p>
+
+            <div className="max-w-2xl mx-auto rounded-xl border border-border bg-muted/30 px-6 py-5 space-y-4">
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                Use the dummy URL below, click on Load Video, then ask questions
+                about the video.
+              </p>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 rounded-lg border border-border bg-background px-4 py-3">
+                <span className="flex-1 text-sm md:text-base font-medium text-foreground break-all text-left">
+                  {DEFAULT_VIDEO_URL}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyDummyUrl}
+                  className="shrink-0"
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </div>
