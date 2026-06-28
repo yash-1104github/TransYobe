@@ -2,7 +2,7 @@
 
 **Application Overview:**
 
-TransYobe is an intelligent web application that helps users interactively get answers to their questions about any YouTube video. By leveraging RAG (Retrieval-Augmented Generation) with Google Gemini embeddings and OpenAI for query retrieval and answer generation, the app enables users to understand video content efficiently without watching the entire thing. Users can sign in, load any YouTube video, and chat in real time with an AI assistant that comprehends the video's content — all within an elegant dashboard interface.
+TransYobe is an intelligent web application that helps users interactively get answers to their questions about any YouTube video. By leveraging RAG (Retrieval-Augmented Generation) with OpenAI embeddings and answer generation, the app enables users to understand video content efficiently without watching the entire thing. Users can sign in, load any YouTube video, and chat in real time with an AI assistant that comprehends the video's content — all within an elegant dashboard interface.
 
 **🛠 Tech Stack Used**
 
@@ -11,8 +11,7 @@ TransYobe is an intelligent web application that helps users interactively get a
 - Authentication: JWT Authentication
 - Database / Vector Store: Pinecone, MongoDB
 - AI Models:
-  - **Google Gemini** (`gemini-embedding-001`) — transcript embeddings at ingest time
-  - **OpenAI** (`text-embedding-3-small`, `gpt-4o-mini`) — query embeddings and answer generation
+  - **OpenAI** (`text-embedding-3-small`, `gpt-4o-mini`) — transcript and query embeddings, plus answer generation
 - Architecture: Retrieval-Augmented Generation (RAG), Server Sent Events (SSE)
 - Hosting: Docker, Vercel, Render
 
@@ -30,8 +29,8 @@ TransYobe is an intelligent web application that helps users interactively get a
 
 1. **Sign In** — Users authenticate using JWT-based login.
 2. **Load Video** — Paste a YouTube video URL into the dashboard to fetch its transcript and metadata.
-3. **Data Indexing** — The transcript is chunked, embedded with Gemini, and stored in Pinecone.
-4. **Ask Questions** — User questions are embedded with OpenAI, relevant chunks are retrieved from Pinecone, and `gpt-4o-mini` generates the answer.
+3. **Data Indexing** — The transcript is chunked, embedded with OpenAI, and stored in Pinecone.
+4. **Ask Questions** — User questions are embedded with the same OpenAI model, relevant chunks are retrieved from Pinecone, and `gpt-4o-mini` generates the answer.
 5. **Interactive Dashboard** — Watch the YouTube video on the left and view the AI's contextual answers in the chat section on the right.
 
 **⚙️ Installation**
@@ -64,14 +63,12 @@ npm run dev
 Create a `.env` file in `backend/` with the following keys:
 
 ```bash
-GOOGLE_API_KEY=your_google_api_key
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 MONGO_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
 PINECONE_API_KEY=your_pinecone_key
 PINECONE_INDEX_NAME=transyobe-index
-GEMINI_EMBEDDING_MODEL=gemini-embedding-001
 CHUNK_SIZE=1020
 CHUNK_OVERLAP=100
 RAPIDAPI_KEY=your_rapidapi_key

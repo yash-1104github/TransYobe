@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Index } from "@pinecone-database/pinecone";
 import pc from "../databse/vector_db";
@@ -11,6 +11,10 @@ const splitter = new RecursiveCharacterTextSplitter({
 });
 
 const indexName = process.env.PINECONE_INDEX_NAME;
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
 
 //Ensures the Pinecone index exists and is ready before using it.
 export async function ensureIndex(): Promise<void> {
@@ -62,11 +66,6 @@ export const loadSampleData = async (content: string): Promise<void> => {
   const chunks = await splitter.splitText(content);
   console.log(`✅ Split text into ${chunks.length} chunks`);
 
-  //Initialize embedding model
-  const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY,
-  });
-
   // Clear existing data
   try {
     await index.deleteAll();
@@ -80,30 +79,27 @@ export const loadSampleData = async (content: string): Promise<void> => {
 
   for (const chunk of chunks) {
 
-    const response = await ai.models.embedContent({
-      model: process.env.GEMINI_EMBEDDING_MODEL,
-      contents: chunk,
+    const embeddingResponse = await client.embeddings.create({
+      model: process.env.OPENAI_EMBEDDING_MODEL!,
+      input: chunk,
+      dimensions: 768,
     });
 
-    const embeddings = response.embeddings;
-    if (embeddings && embeddings.length > 0) {
-      const vector = embeddings[0].values.slice(0, 768);
+    const vector = embeddingResponse.data[0].embedding;
 
-      await index.upsert([
-        {
-          id: `chunk-${count}`,
-          values: vector,
-          metadata: { text: chunk },
-        },
-      ]);
+    await index.upsert([
+      {
+        id: `chunk-${count}`,
+        values: vector,
+        metadata: { text: chunk },
+      },
+    ]);
 
-      
-      const percentage = Math.round(((count + 1) / chunks.length) * 100);
-      console.log(`📦 Stored chunk ${count + 1}/${chunks.length}`);
+    const percentage = Math.round(((count + 1) / chunks.length) * 100);
+    console.log(`📦 Stored chunk ${count + 1}/${chunks.length}`);
 
-      sendProgress(percentage);
-      count++;
-    }
+    sendProgress(percentage);
+    count++;
   }
 
   console.log("Data ingestion complete....");

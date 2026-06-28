@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@datastax/astra-db-ts": "^2.1.1",
-    "@google/genai": "^1.23.0",
     "@huggingface/inference": "^4.13.5",
     "@langchain/core": "^0.3.78",
     "@langchain/textsplitters": "^0.1.0",
