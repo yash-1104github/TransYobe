@@ -66,6 +66,7 @@ Create a `.env` file in `backend/` with the following keys:
 ```bash
 GOOGLE_API_KEY=your_google_api_key
 OPENAI_API_KEY=your_openai_api_key
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 MONGO_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
 PINECONE_API_KEY=your_pinecone_key

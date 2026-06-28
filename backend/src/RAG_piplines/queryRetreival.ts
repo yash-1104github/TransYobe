@@ -13,7 +13,7 @@ export const loadanswer = async (question: string) => {
     console.log("Creating embedding with OpenAI...");
 
     const embeddingResponse = await client.embeddings.create({
-      model: "text-embedding-3-small",
+      model: process.env.OPENAI_EMBEDDING_MODEL!,
       input: question,
       dimensions: 768,
     });
